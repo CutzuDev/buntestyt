@@ -96,36 +96,90 @@ export async function getPlaylistInfo(playlistID: string) {
     return videoData;
   }
 }
-
-async function getData({ id, name }: { id: string; name?: string }) {
+async function getChannelData({ id, name }: { id: string; name?: string }) {
   const data = await getPlaylistInfo(id);
-  // const date = new Date();
-  // const fileName = `${date.toDateString()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}`;
-  // const path = `./folder/delete/${fileName}.ts`;
+  if (data) {
+    const filter: ChannelData[] = data.map((e) => ({ ...e.data.channel }));
+    const result = filter.filter((element, index) => {
+      return filter.findIndex((el) => el.name === element.name) === index;
+    });
+    if (name) {
+      return `const ${name}: ChannelData[] = ${JSON.stringify(result)}`;
+    } else {
+      return `const singleArray: ChannelData[] = ${JSON.stringify(result)}`;
+    }
+  }
+}
+
+async function getVideoData({ id, name }: { id: string; name?: string }) {
+  const data = await getPlaylistInfo(id);
   if (name) {
-    return `const ${name} = ${JSON.stringify(data)}`;
+    return `const ${name}: VideoData[] = ${JSON.stringify(data)}`;
   } else {
-    return `const singleArray = ${JSON.stringify(data)}`;
+    return `const singleArray: VideoData[] = ${JSON.stringify(data)}`;
   }
 }
 
 const server = Bun.serve({
-  port: 3000,
+  port: 6969,
   async fetch(request) {
     // const path = "./folder/test.ts";
     // const file = Bun.file(path);
     const serverURL = new URL(request.url);
     // console.log(test1.searchParams);
-    if (serverURL.pathname === "/fetch" && request.method === "GET") {
+    if (serverURL.pathname === "/v" && request.method === "GET") {
       const id = serverURL.searchParams.get("id");
       const name = serverURL.searchParams.get("name");
       // console.log(serverURL.searchParams)
       if (id) {
         let msg;
         if (name) {
-          msg = await getData({ id: id, name: name });
+          msg = await getVideoData({ id: id, name: name });
         } else {
-          msg = await getData({ id: id });
+          msg = await getVideoData({ id: id });
+        }
+        return new Response(
+          `<html>
+          <style>
+            .container {
+              display: flex;
+              justify-items: center;
+              align-items: center;
+              flex-direction: column;
+              width: 100%;
+              gap: 2rem;
+            }
+          </style>
+          <body>
+            <div class="container">
+              <button style="width: fit-content" onclick="main()">Copy</button>
+              <span>${msg}</span>
+            </div>
+            <script >
+              function main() {
+                navigator.clipboard.writeText(${JSON.stringify(msg)});
+              }
+            </script>
+          </body>
+        </html>
+        `,
+          {
+            headers: {
+              "Content-Type": "text/html",
+            },
+          }
+        );
+      }
+    }
+    if (serverURL.pathname === "/c" && request.method === "GET") {
+      const id = serverURL.searchParams.get("id");
+      const name = serverURL.searchParams.get("name");
+      if (id) {
+        let msg;
+        if (name) {
+          msg = await getChannelData({ id: id, name: name });
+        } else {
+          msg = await getChannelData({ id: id });
         }
         return new Response(
           `<html>
