@@ -112,7 +112,7 @@ async function getChannelData({ id, name }: { id: string; name?: string }) {
 }
 
 async function getVideoData({ id, name }: { id: string; name?: string }) {
-  const data = await getPlaylistInfo(id);
+  const data = await getVideoInfo(id);
   if (name) {
     return `const ${name}: VideoData[] = ${JSON.stringify(data)}`;
   } else {
@@ -137,6 +137,7 @@ const server = Bun.serve({
           msg = await getVideoData({ id: id, name: name });
         } else {
           msg = await getVideoData({ id: id });
+          // console.log(msg)
         }
         return new Response(
           `<html>
