@@ -119,6 +119,14 @@ async function getVideoData({ id, name }: { id: string; name?: string }) {
     return `const singleArray: VideoData[] = ${JSON.stringify(data)}`;
   }
 }
+async function getPlayListData({ id, name }: { id: string; name?: string }) {
+  const data = await getPlaylistInfo(id);
+  if (name) {
+    return `const ${name}: VideoData[] = ${JSON.stringify(data)}`;
+  } else {
+    return `const singleArray: VideoData[] = ${JSON.stringify(data)}`;
+  }
+}
 
 const server = Bun.serve({
   port: 6969,
@@ -138,6 +146,49 @@ const server = Bun.serve({
         } else {
           msg = await getVideoData({ id: id });
           // console.log(msg)
+        }
+        return new Response(
+          `<html>
+          <style>
+            .container {
+              display: flex;
+              justify-items: center;
+              align-items: center;
+              flex-direction: column;
+              width: 100%;
+              gap: 2rem;
+            }
+          </style>
+          <body>
+            <div class="container">
+              <button style="width: fit-content" onclick="main()">Copy</button>
+              <span>${msg}</span>
+            </div>
+            <script >
+              function main() {
+                navigator.clipboard.writeText(${JSON.stringify(msg)});
+              }
+            </script>
+          </body>
+        </html>
+        `,
+          {
+            headers: {
+              "Content-Type": "text/html",
+            },
+          }
+        );
+      }
+    }
+    if (serverURL.pathname === "/p" && request.method === "GET") {
+      const id = serverURL.searchParams.get("id");
+      const name = serverURL.searchParams.get("name");
+      if (id) {
+        let msg;
+        if (name) {
+          msg = await getPlayListData({ id: id, name: name });
+        } else {
+          msg = await getPlayListData({ id: id });
         }
         return new Response(
           `<html>
