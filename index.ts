@@ -274,8 +274,12 @@ const server = Bun.serve({
     //   headers: { "Content-Type": "application/json" },
     // });
     return Response.json({
-      Usage: "url.com/fetch?id=playlistID",
-      Optiona: "url.com/fetch?name=arrayName&id=playlistID",
+      Usage1: "url.com/v?id=videoID",
+      Optional1: "url.com/v?name=arrayName&id=videoID",
+      Usage2: "url.com/p?id=playlistID",
+      Optional2: "url.com/p?name=arrayName&id=playlistID",
+      Usage3: "url.com/c?id=playlistID",
+      Optional3: "url.com/c?name=arrayName&id=channelID",
     });
   },
 });
