@@ -30,7 +30,11 @@ export type ChannelData = {
   pfp: string;
 };
 
-const youtube = new Client({fetchOptions: {}});
+const youtube = new Client({ 
+  fetchOptions: { 
+    headers: { 'Accept-Language': 'en' }
+  }
+});
 
 export async function getVideoInfo(videoID: string) {
   const result = await youtube.getVideo(videoID);
