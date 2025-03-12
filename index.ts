@@ -410,7 +410,7 @@ const server = Bun.serve({
                         <input type="text" id="channel-name" name="name" placeholder="e.g. channelData">
                         <button type="button" class="clear-btn" onclick="clearInput('channel-name', 'channelName')">&times;</button>
                       </div>
-                      <div class="optional">Optional - defaults to "channelData"</div>
+                      <div class="optional">Optional - defaults to "channelDataUtils"</div>
                     </div>
                     <button type="submit" class="btn">Fetch Channel Data</button>
                   </form>
@@ -597,7 +597,7 @@ const server = Bun.serve({
         text-decoration: none;
         display: inline-block;
         font-size: 14px;
-        border-radius: 0 4px 4px 0;
+        border-radius: 4px;
         cursor: pointer;
         height: 36px;
         transition: background-color 0.3s;
@@ -616,6 +616,7 @@ const server = Bun.serve({
         margin-left: 10px;
         cursor: pointer;
         font-size: 14px;
+        height: 36px;
         transition: background-color 0.3s;
       }
       
@@ -814,7 +815,7 @@ const ${name}: VideoData[] = ${JSON.stringify(playlistData, null, 2)};
     // Channel route
     if (serverURL.pathname === "/c" && request.method === "GET") {
       const id = serverURL.searchParams.get("id");
-      const name = serverURL.searchParams.get("name") || "channelData";
+      const name = serverURL.searchParams.get("name") || "channelDataUtils";
       
       if (id) {
         const playlistData = await getPlaylistInfo(id);
@@ -826,8 +827,10 @@ const ${name}: VideoData[] = ${JSON.stringify(playlistData, null, 2)};
         });
         
         const output = `
+import { ChannelData } from "./utils";
+
 // Channel data
-const ${name}: ChannelData[] = ${JSON.stringify(uniqueChannels, null, 2)};
+export const ${name}: ChannelData[] = ${JSON.stringify(uniqueChannels, null, 2)};
 `;
 
         return new Response(
@@ -912,14 +915,16 @@ const ${name}: ChannelData[] = ${JSON.stringify(uniqueChannels, null, 2)};
 
         // Create the output string with proper formatting
         const output = `
+import { VideoData } from "./utils";
+
 // Video data arrays
-const c1Data: VideoData[] = ${JSON.stringify(c1Data, null, 2)};
+export const c1Data: VideoData[] = ${JSON.stringify(c1Data, null, 2)};
 
-const c2Data: VideoData[] = ${JSON.stringify(c2Data, null, 2)};
+export const c2Data: VideoData[] = ${JSON.stringify(c2Data, null, 2)};
 
-const c3Data: VideoData[] = ${JSON.stringify(c3Data, null, 2)};
+export const c3Data: VideoData[] = ${JSON.stringify(c3Data, null, 2)};
 
-const c4Data: VideoData[] = ${JSON.stringify(c4Data, null, 2)};
+export const c4Data: VideoData[] = ${JSON.stringify(c4Data, null, 2)};
 `;
 
         return new Response(
