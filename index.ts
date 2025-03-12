@@ -296,6 +296,36 @@ const server = Bun.serve({
               color: #777;
               border-top: 1px solid var(--border-color);
             }
+
+            .input-group {
+              position: relative;
+              display: flex;
+              align-items: center;
+            }
+
+            .clear-btn {
+              position: absolute;
+              right: 10px;
+              width: 25px;
+              height: 25px;
+              border: 1px solid rgba(0,0,0,0.1);
+              border-radius: 25%;
+              background: rgba(0,0,0,0.05);
+              cursor: pointer;
+              color: #999;
+              font-size: 16px;
+              display: none;
+            }
+
+            .clear-btn:hover {
+              color: #666;
+            }
+
+            input[type="text"]:not(:placeholder-shown) + .clear-btn {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
           </style>
         </head>
         <body>
@@ -315,11 +345,17 @@ const server = Bun.serve({
                   <form id="videoForm" action="/v" method="get">
                     <div class="form-group">
                       <label for="video-id">Video ID</label>
-                      <input type="text" id="video-id" name="id" placeholder="e.g. dQw4w9WgXcQ" required>
+                      <div class="input-group">
+                        <input type="text" id="video-id" name="id" placeholder="e.g. dQw4w9WgXcQ" required>
+                        <button type="button" class="clear-btn" onclick="clearInput('video-id', 'videoID')">&times;</button>
+                      </div>
                     </div>
                     <div class="form-group">
                       <label for="video-name">Variable Name</label>
-                      <input type="text" id="video-name" name="name" placeholder="e.g. videoData">
+                      <div class="input-group">
+                        <input type="text" id="video-name" name="name" placeholder="e.g. videoData">
+                        <button type="button" class="clear-btn" onclick="clearInput('video-name', 'videoName')">&times;</button>
+                      </div>
                       <div class="optional">Optional - defaults to "videoData"</div>
                     </div>
                     <button type="submit" class="btn">Fetch Video Data</button>
@@ -336,11 +372,17 @@ const server = Bun.serve({
                   <form id="playlistForm" action="/p" method="get">
                     <div class="form-group">
                       <label for="playlist-id">Playlist ID</label>
-                      <input type="text" id="playlist-id" name="id" placeholder="e.g. PL59FEE129ADFF8C5A" required>
+                      <div class="input-group">
+                        <input type="text" id="playlist-id" name="id" placeholder="e.g. PL59FEE129ADFF8C5A" required>
+                        <button type="button" class="clear-btn" onclick="clearInput('playlist-id', 'playlistID')">&times;</button>
+                      </div>
                     </div>
                     <div class="form-group">
                       <label for="playlist-name">Variable Name</label>
-                      <input type="text" id="playlist-name" name="name" placeholder="e.g. playlistData">
+                      <div class="input-group">
+                        <input type="text" id="playlist-name" name="name" placeholder="e.g. playlistData">
+                        <button type="button" class="clear-btn" onclick="clearInput('playlist-name', 'playlistName')">&times;</button>
+                      </div>
                       <div class="optional">Optional - defaults to "playlistData"</div>
                     </div>
                     <button type="submit" class="btn">Fetch Playlist Data</button>
@@ -357,11 +399,17 @@ const server = Bun.serve({
                   <form id="channelForm" action="/c" method="get">
                     <div class="form-group">
                       <label for="channel-id">Channel Playlist ID</label>
-                      <input type="text" id="channel-id" name="id" placeholder="e.g. UU-lHJZR3Gqxm24_Vd_AJ5Yw" required>
+                      <div class="input-group">
+                        <input type="text" id="channel-id" name="id" placeholder="e.g. UU-lHJZR3Gqxm24_Vd_AJ5Yw" required>
+                        <button type="button" class="clear-btn" onclick="clearInput('channel-id', 'channelID')">&times;</button>
+                      </div>
                     </div>
                     <div class="form-group">
                       <label for="channel-name">Variable Name</label>
-                      <input type="text" id="channel-name" name="name" placeholder="e.g. channelData">
+                      <div class="input-group">
+                        <input type="text" id="channel-name" name="name" placeholder="e.g. channelData">
+                        <button type="button" class="clear-btn" onclick="clearInput('channel-name', 'channelName')">&times;</button>
+                      </div>
                       <div class="optional">Optional - defaults to "channelData"</div>
                     </div>
                     <button type="submit" class="btn">Fetch Channel Data</button>
@@ -379,19 +427,31 @@ const server = Bun.serve({
                 <form id="batchForm" action="/b" method="get">
                   <div class="form-group">
                     <label for="batch-id1">Playlist ID 1 (c1Data)</label>
-                    <input type="text" id="batch-id1" name="id1" placeholder="First playlist ID" required>
+                    <div class="input-group">
+                      <input type="text" id="batch-id1" name="id1" placeholder="First playlist ID" required>
+                      <button type="button" class="clear-btn" onclick="clearInput('batch-id1', 'batchID1')">&times;</button>
+                    </div>
                   </div>
                   <div class="form-group">
                     <label for="batch-id2">Playlist ID 2 (c2Data)</label>
-                    <input type="text" id="batch-id2" name="id2" placeholder="Second playlist ID" required>
+                    <div class="input-group">
+                      <input type="text" id="batch-id2" name="id2" placeholder="Second playlist ID" required>
+                      <button type="button" class="clear-btn" onclick="clearInput('batch-id2', 'batchID2')">&times;</button>
+                    </div>
                   </div>
                   <div class="form-group">
                     <label for="batch-id3">Playlist ID 3 (c3Data)</label>
-                    <input type="text" id="batch-id3" name="id3" placeholder="Third playlist ID" required>
+                    <div class="input-group">
+                      <input type="text" id="batch-id3" name="id3" placeholder="Third playlist ID" required>
+                      <button type="button" class="clear-btn" onclick="clearInput('batch-id3', 'batchID3')">&times;</button>
+                    </div>
                   </div>
                   <div class="form-group">
                     <label for="batch-id4">Playlist ID 4 (c4Data)</label>
-                    <input type="text" id="batch-id4" name="id4" placeholder="Fourth playlist ID" required>
+                    <div class="input-group">
+                      <input type="text" id="batch-id4" name="id4" placeholder="Fourth playlist ID" required>
+                      <button type="button" class="clear-btn" onclick="clearInput('batch-id4', 'batchID4')">&times;</button>
+                    </div>
                   </div>
                   <button type="submit" class="btn">Fetch Batch Data</button>
                 </form>
@@ -402,6 +462,53 @@ const server = Bun.serve({
               <p>YouTube Data Fetcher | Built with Bun and TypeScript</p>
             </footer>
           </div>
+
+          <script>
+            // Load saved data from localStorage when page loads
+            document.addEventListener('DOMContentLoaded', function() {
+              // Map of input IDs to their localStorage keys
+              const inputMap = {
+                'video-id': 'videoID',
+                'video-name': 'videoName',
+                'playlist-id': 'playlistID',
+                'playlist-name': 'playlistName',
+                'channel-id': 'channelID',
+                'channel-name': 'channelName',
+                'batch-id1': 'batchID1',
+                'batch-id2': 'batchID2',
+                'batch-id3': 'batchID3',
+                'batch-id4': 'batchID4'
+              };
+
+              // For each input, load saved value if it exists
+              Object.entries(inputMap).forEach(([inputId, storageKey]) => {
+                const savedValue = localStorage.getItem(storageKey);
+                if (savedValue) {
+                  document.getElementById(inputId).value = savedValue;
+                }
+              });
+
+              // Save input values on change
+              Object.entries(inputMap).forEach(([inputId, storageKey]) => {
+                const input = document.getElementById(inputId);
+                input.addEventListener('input', function() {
+                  if (this.value) {
+                    localStorage.setItem(storageKey, this.value);
+                  } else {
+                    localStorage.removeItem(storageKey);
+                  }
+                });
+              });
+            });
+
+            // Function to clear an input and remove from localStorage
+            function clearInput(inputId, storageKey) {
+              const input = document.getElementById(inputId);
+              input.value = '';
+              localStorage.removeItem(storageKey);
+              input.focus();
+            }
+          </script>
         </body>
         </html>`,
         {
@@ -570,28 +677,6 @@ const server = Bun.serve({
         if (!videoData) return new Response("Video not found", { status: 404 });
         
         const output = `
-// Define the VideoData interface if you haven't already
-interface VideoData {
-  data: {
-    video: {
-      title: string;
-      url: string;
-      id: string;
-      viewCount: number;
-      likeCount: number;
-      thumbnail: string;
-      date: string;
-    };
-    channel: {
-      name: string;
-      url: string;
-      subCount: string;
-      id: string;
-      pfp: string;
-    };
-  };
-}
-
 // Single video data
 const ${name}: VideoData = ${JSON.stringify(videoData, null, 2)};
 `;
@@ -664,28 +749,6 @@ const ${name}: VideoData = ${JSON.stringify(videoData, null, 2)};
         if (!playlistData) return new Response("Playlist not found", { status: 404 });
         
         const output = `
-// Define the VideoData interface if you haven't already
-interface VideoData {
-  data: {
-    video: {
-      title: string;
-      url: string;
-      id: string;
-      viewCount: number;
-      likeCount: number;
-      thumbnail: string;
-      date: string;
-    };
-    channel: {
-      name: string;
-      url: string;
-      subCount: string;
-      id: string;
-      pfp: string;
-    };
-  };
-}
-
 // Playlist video data
 const ${name}: VideoData[] = ${JSON.stringify(playlistData, null, 2)};
 `;
@@ -763,15 +826,6 @@ const ${name}: VideoData[] = ${JSON.stringify(playlistData, null, 2)};
         });
         
         const output = `
-// Define the ChannelData interface if you haven't already
-interface ChannelData {
-  name: string;
-  url: string;
-  subCount: string;
-  id: string;
-  pfp: string;
-}
-
 // Channel data
 const ${name}: ChannelData[] = ${JSON.stringify(uniqueChannels, null, 2)};
 `;
@@ -858,28 +912,6 @@ const ${name}: ChannelData[] = ${JSON.stringify(uniqueChannels, null, 2)};
 
         // Create the output string with proper formatting
         const output = `
-// Define the VideoData interface if you haven't already
-interface VideoData {
-  data: {
-    video: {
-      title: string;
-      url: string;
-      id: string;
-      viewCount: number;
-      likeCount: number;
-      thumbnail: string;
-      date: string;
-    };
-    channel: {
-      name: string;
-      url: string;
-      subCount: string;
-      id: string;
-      pfp: string;
-    };
-  };
-}
-
 // Video data arrays
 const c1Data: VideoData[] = ${JSON.stringify(c1Data, null, 2)};
 
