@@ -100,82 +100,531 @@ export async function getPlaylistInfo(playlistID: string) {
     return videoData;
   }
 }
-async function getChannelData({ id, name }: { id: string; name?: string }) {
-  const data = await getPlaylistInfo(id);
-  if (data) {
-    const filter: ChannelData[] = data.map((e) => ({ ...e.data.channel }));
-    const result = filter.filter((element, index) => {
-      return filter.findIndex((el) => el.name === element.name) === index;
-    });
-    if (name) {
-      return `const ${name}: ChannelData[] = ${JSON.stringify(result)}`;
-    } else {
-      return `const singleArray: ChannelData[] = ${JSON.stringify(result)}`;
-    }
-  }
-}
-
-async function getVideoData({ id, name }: { id: string; name?: string }) {
-  const data = await getVideoInfo(id);
-  if (name) {
-    return `const ${name}: VideoData[] = ${JSON.stringify(data)}`;
-  } else {
-    return `const singleArray: VideoData[] = ${JSON.stringify(data)}`;
-  }
-}
-async function getPlayListData({ id, name }: { id: string; name?: string }) {
-  const data = await getPlaylistInfo(id);
-  if (name) {
-    return `const ${name}: VideoData[] = ${JSON.stringify(data)}`;
-  } else {
-    return `const singleArray: VideoData[] = ${JSON.stringify(data)}`;
-  }
-}
 
 const server = Bun.serve({
   port: 6969,
   async fetch(request) {
-    // const path = "./folder/test.ts";
-    // const file = Bun.file(path);
     const serverURL = new URL(request.url);
-    // console.log(test1.searchParams);
+    
+    // Landing page with forms for each path
+    if (serverURL.pathname === "/" || serverURL.pathname === "") {
+      return new Response(
+        `<!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>YouTube Data Fetcher</title>
+          <style>
+            :root {
+              --primary-color: #4CAF50;
+              --primary-hover: #45a049;
+              --primary-active: #3e8e41;
+              --secondary-color: #2196F3;
+              --card-bg: #f9f9f9;
+              --border-color: #e0e0e0;
+            }
+            
+            * {
+              box-sizing: border-box;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            }
+            
+            body {
+              margin: 0;
+              padding: 0;
+              background-color: #f5f5f5;
+              color: #333;
+            }
+            
+            .container {
+              max-width: 1200px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            
+            header {
+              text-align: center;
+              margin-bottom: 40px;
+              padding: 20px;
+              background-color: white;
+              border-radius: 8px;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            h1 {
+              margin: 0;
+              color: #333;
+              font-size: 2.5rem;
+            }
+            
+            h2 {
+              margin-top: 0;
+              color: #444;
+              font-size: 1.5rem;
+            }
+            
+            .cards {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+              gap: 20px;
+              margin-bottom: 40px;
+            }
+            
+            .card {
+              background-color: var(--card-bg);
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+              transition: transform 0.3s ease;
+            }
+            
+            .card:hover {
+              transform: translateY(-5px);
+              box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+            
+            .card-header {
+              background-color: var(--primary-color);
+              color: white;
+              padding: 15px;
+              font-size: 1.2rem;
+              font-weight: bold;
+            }
+            
+            .batch-card .card-header {
+              background-color: var(--secondary-color);
+            }
+            
+            .card-body {
+              padding: 20px;
+            }
+            
+            .form-group {
+              margin-bottom: 15px;
+            }
+            
+            label {
+              display: block;
+              margin-bottom: 5px;
+              font-weight: 500;
+            }
+            
+            input[type="text"] {
+              width: 100%;
+              padding: 10px;
+              border: 1px solid var(--border-color);
+              border-radius: 4px;
+              font-size: 16px;
+              transition: border-color 0.3s;
+            }
+            
+            input[type="text"]:focus {
+              border-color: var(--primary-color);
+              outline: none;
+              box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            }
+            
+            .btn {
+              background-color: var(--primary-color);
+              border: none;
+              color: white;
+              padding: 12px 20px;
+              text-align: center;
+              text-decoration: none;
+              display: inline-block;
+              font-size: 16px;
+              font-weight: 600;
+              border-radius: 4px;
+              cursor: pointer;
+              transition: background-color 0.3s, transform 0.1s;
+              width: 100%;
+              margin-top: 10px;
+            }
+            
+            .btn:hover {
+              background-color: var(--primary-hover);
+            }
+            
+            .btn:active {
+              background-color: var(--primary-active);
+              transform: translateY(1px);
+            }
+            
+            .batch-card .btn {
+              background-color: var(--secondary-color);
+            }
+            
+            .batch-card .btn:hover {
+              background-color: #1976D2;
+            }
+            
+            .batch-card .btn:active {
+              background-color: #1565C0;
+            }
+            
+            .optional {
+              font-size: 0.8rem;
+              color: #777;
+              margin-top: 2px;
+            }
+            
+            footer {
+              text-align: center;
+              margin-top: 40px;
+              padding: 20px;
+              color: #777;
+              border-top: 1px solid var(--border-color);
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <header>
+              <h1>YouTube Data Fetcher</h1>
+              <p>Extract formatted TypeScript data from YouTube videos, playlists, and channels</p>
+            </header>
+            
+            <div class="cards">
+              <!-- Single Video Card -->
+              <div class="card">
+                <div class="card-header">
+                  Single Video
+                </div>
+                <div class="card-body">
+                  <form id="videoForm" action="/v" method="get">
+                    <div class="form-group">
+                      <label for="video-id">Video ID</label>
+                      <input type="text" id="video-id" name="id" placeholder="e.g. dQw4w9WgXcQ" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="video-name">Variable Name</label>
+                      <input type="text" id="video-name" name="name" placeholder="e.g. videoData">
+                      <div class="optional">Optional - defaults to "videoData"</div>
+                    </div>
+                    <button type="submit" class="btn">Fetch Video Data</button>
+                  </form>
+                </div>
+              </div>
+              
+              <!-- Playlist Card -->
+              <div class="card">
+                <div class="card-header">
+                  Playlist
+                </div>
+                <div class="card-body">
+                  <form id="playlistForm" action="/p" method="get">
+                    <div class="form-group">
+                      <label for="playlist-id">Playlist ID</label>
+                      <input type="text" id="playlist-id" name="id" placeholder="e.g. PL59FEE129ADFF8C5A" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="playlist-name">Variable Name</label>
+                      <input type="text" id="playlist-name" name="name" placeholder="e.g. playlistData">
+                      <div class="optional">Optional - defaults to "playlistData"</div>
+                    </div>
+                    <button type="submit" class="btn">Fetch Playlist Data</button>
+                  </form>
+                </div>
+              </div>
+              
+              <!-- Channel Card -->
+              <div class="card">
+                <div class="card-header">
+                  Channel
+                </div>
+                <div class="card-body">
+                  <form id="channelForm" action="/c" method="get">
+                    <div class="form-group">
+                      <label for="channel-id">Channel Playlist ID</label>
+                      <input type="text" id="channel-id" name="id" placeholder="e.g. UU-lHJZR3Gqxm24_Vd_AJ5Yw" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="channel-name">Variable Name</label>
+                      <input type="text" id="channel-name" name="name" placeholder="e.g. channelData">
+                      <div class="optional">Optional - defaults to "channelData"</div>
+                    </div>
+                    <button type="submit" class="btn">Fetch Channel Data</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Batch Card -->
+            <div class="card batch-card">
+              <div class="card-header">
+                Batch (Multiple Playlists)
+              </div>
+              <div class="card-body">
+                <form id="batchForm" action="/b" method="get">
+                  <div class="form-group">
+                    <label for="batch-id1">Playlist ID 1 (c1Data)</label>
+                    <input type="text" id="batch-id1" name="id1" placeholder="First playlist ID" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="batch-id2">Playlist ID 2 (c2Data)</label>
+                    <input type="text" id="batch-id2" name="id2" placeholder="Second playlist ID" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="batch-id3">Playlist ID 3 (c3Data)</label>
+                    <input type="text" id="batch-id3" name="id3" placeholder="Third playlist ID" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="batch-id4">Playlist ID 4 (c4Data)</label>
+                    <input type="text" id="batch-id4" name="id4" placeholder="Fourth playlist ID" required>
+                  </div>
+                  <button type="submit" class="btn">Fetch Batch Data</button>
+                </form>
+              </div>
+            </div>
+            
+            <footer>
+              <p>YouTube Data Fetcher | Built with Bun and TypeScript</p>
+            </footer>
+          </div>
+        </body>
+        </html>`,
+        {
+          headers: {
+            "Content-Type": "text/html",
+          },
+        }
+      );
+    }
+    
+    // Common result page style and navbar for all routes
+    const commonResultPageStyle = `
+      /* Base styles */
+      * {
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      }
+      
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        color: #333;
+      }
+      
+      /* Navbar styles */
+      .navbar {
+        background-color: #333;
+        color: white;
+        padding: 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        height: 60px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      
+      .navbar-left {
+        display: flex;
+        align-items: center;
+      }
+      
+      .navbar-brand {
+        color: white;
+        text-decoration: none;
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-right: 20px;
+      }
+      
+      .navbar-right {
+        display: flex;
+        align-items: center;
+      }
+      
+      .navbar-form {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        max-width: 800px;
+      }
+      
+      .navbar-input {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px 0 0 4px;
+        font-size: 14px;
+        flex: 1;
+        height: 36px;
+      }
+      
+      .navbar-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px #4CAF50;
+      }
+      
+      .navbar-button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 8px 16px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+        height: 36px;
+        transition: background-color 0.3s;
+      }
+      
+      .navbar-button:hover {
+        background-color: #45a049;
+      }
+      
+      .copy-btn {
+        background-color: #2196F3;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        margin-left: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+      }
+      
+      .copy-btn:hover {
+        background-color: #1976D2;
+      }
+      
+      .home-btn {
+        display: flex;
+        align-items: center;
+        background-color: transparent;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        margin-right: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        transition: background-color 0.3s;
+      }
+      
+      .home-btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      
+      /* Main container */
+      .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 20px;
+      }
+      
+      pre {
+        background-color: white;
+        padding: 20px;
+        overflow: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        font-family: monospace;
+        margin-top: 20px;
+        white-space: pre-wrap;
+      }
+      
+      .navbar-title {
+        margin: 0 20px;
+        font-size: 1.2rem;
+        font-weight: 500;
+      }
+    `;
+    
+    // Single video route
     if (serverURL.pathname === "/v" && request.method === "GET") {
       const id = serverURL.searchParams.get("id");
-      const name = serverURL.searchParams.get("name");
-      // console.log(serverURL.searchParams)
+      const name = serverURL.searchParams.get("name") || "videoData";
+      
       if (id) {
-        let msg;
-        if (name) {
-          msg = await getVideoData({ id: id, name: name });
-        } else {
-          msg = await getVideoData({ id: id });
-          // console.log(msg)
-        }
+        const videoData = await getVideoInfo(id);
+        if (!videoData) return new Response("Video not found", { status: 404 });
+        
+        const output = `
+// Define the VideoData interface if you haven't already
+interface VideoData {
+  data: {
+    video: {
+      title: string;
+      url: string;
+      id: string;
+      viewCount: number;
+      likeCount: number;
+      thumbnail: string;
+      date: string;
+    };
+    channel: {
+      name: string;
+      url: string;
+      subCount: string;
+      id: string;
+      pfp: string;
+    };
+  };
+}
+
+// Single video data
+const ${name}: VideoData = ${JSON.stringify(videoData, null, 2)};
+`;
+
         return new Response(
-          `<html>
-          <style>
-            .container {
-              display: flex;
-              justify-items: center;
-              align-items: center;
-              flex-direction: column;
-              width: 100%;
-              gap: 2rem;
-            }
-          </style>
+          `<!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Video Data: ${id}</title>
+            <style>${commonResultPageStyle}</style>
+          </head>
           <body>
+            <nav class="navbar">
+              <div class="navbar-left">
+                <a href="/" class="navbar-brand">YouTube Data Fetcher</a>
+                <div class="navbar-title">Video Data</div>
+              </div>
+              <div class="navbar-right">
+                <a href="/" class="home-btn">Home</a>
+                <form class="navbar-form" action="/v" method="get">
+                  <input type="text" class="navbar-input" name="id" placeholder="Enter video ID" value="${id}" required>
+                  <input type="hidden" name="name" value="${name}">
+                  <button type="submit" class="navbar-button">Fetch</button>
+                </form>
+                <button onclick="copyToClipboard()" class="copy-btn">Copy Code</button>
+              </div>
+            </nav>
+            
             <div class="container">
-              <button style="width: fit-content" onclick="main()">Copy</button>
-              <span>${msg}</span>
+              <pre id="codeOutput">${output}</pre>
             </div>
-            <script >
-              function main() {
-                navigator.clipboard.writeText(${JSON.stringify(msg)});
+            
+            <script>
+              function copyToClipboard() {
+                const code = document.getElementById('codeOutput').textContent;
+                navigator.clipboard.writeText(code)
+                  .then(() => {
+                    const btn = document.querySelector('.copy-btn');
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => {
+                      btn.textContent = originalText;
+                    }, 2000);
+                  })
+                  .catch(err => {
+                    console.error('Failed to copy: ', err);
+                  });
               }
             </script>
           </body>
-        </html>
-        `,
+          </html>`,
           {
             headers: {
               "Content-Type": "text/html",
@@ -184,41 +633,92 @@ const server = Bun.serve({
         );
       }
     }
+    
+    // Playlist route
     if (serverURL.pathname === "/p" && request.method === "GET") {
       const id = serverURL.searchParams.get("id");
-      const name = serverURL.searchParams.get("name");
+      const name = serverURL.searchParams.get("name") || "playlistData";
+      
       if (id) {
-        let msg;
-        if (name) {
-          msg = await getPlayListData({ id: id, name: name });
-        } else {
-          msg = await getPlayListData({ id: id });
-        }
+        const playlistData = await getPlaylistInfo(id);
+        if (!playlistData) return new Response("Playlist not found", { status: 404 });
+        
+        const output = `
+// Define the VideoData interface if you haven't already
+interface VideoData {
+  data: {
+    video: {
+      title: string;
+      url: string;
+      id: string;
+      viewCount: number;
+      likeCount: number;
+      thumbnail: string;
+      date: string;
+    };
+    channel: {
+      name: string;
+      url: string;
+      subCount: string;
+      id: string;
+      pfp: string;
+    };
+  };
+}
+
+// Playlist video data
+const ${name}: VideoData[] = ${JSON.stringify(playlistData, null, 2)};
+`;
+
         return new Response(
-          `<html>
-          <style>
-            .container {
-              display: flex;
-              justify-items: center;
-              align-items: center;
-              flex-direction: column;
-              width: 100%;
-              gap: 2rem;
-            }
-          </style>
+          `<!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Playlist Data: ${id}</title>
+            <style>${commonResultPageStyle}</style>
+          </head>
           <body>
+            <nav class="navbar">
+              <div class="navbar-left">
+                <a href="/" class="navbar-brand">YouTube Data Fetcher</a>
+                <div class="navbar-title">Playlist Data</div>
+              </div>
+              <div class="navbar-right">
+                <a href="/" class="home-btn">Home</a>
+                <form class="navbar-form" action="/p" method="get">
+                  <input type="text" class="navbar-input" name="id" placeholder="Enter playlist ID" value="${id}" required>
+                  <input type="hidden" name="name" value="${name}">
+                  <button type="submit" class="navbar-button">Fetch</button>
+                </form>
+                <button onclick="copyToClipboard()" class="copy-btn">Copy Code</button>
+              </div>
+            </nav>
+            
             <div class="container">
-              <button style="width: fit-content" onclick="main()">Copy</button>
-              <span>${msg}</span>
+              <pre id="codeOutput">${output}</pre>
             </div>
-            <script >
-              function main() {
-                navigator.clipboard.writeText(${JSON.stringify(msg)});
+            
+            <script>
+              function copyToClipboard() {
+                const code = document.getElementById('codeOutput').textContent;
+                navigator.clipboard.writeText(code)
+                  .then(() => {
+                    const btn = document.querySelector('.copy-btn');
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => {
+                      btn.textContent = originalText;
+                    }, 2000);
+                  })
+                  .catch(err => {
+                    console.error('Failed to copy: ', err);
+                  });
               }
             </script>
           </body>
-        </html>
-        `,
+          </html>`,
           {
             headers: {
               "Content-Type": "text/html",
@@ -227,41 +727,84 @@ const server = Bun.serve({
         );
       }
     }
+    
+    // Channel route
     if (serverURL.pathname === "/c" && request.method === "GET") {
       const id = serverURL.searchParams.get("id");
-      const name = serverURL.searchParams.get("name");
+      const name = serverURL.searchParams.get("name") || "channelData";
+      
       if (id) {
-        let msg;
-        if (name) {
-          msg = await getChannelData({ id: id, name: name });
-        } else {
-          msg = await getChannelData({ id: id });
-        }
+        const playlistData = await getPlaylistInfo(id);
+        if (!playlistData) return new Response("Channel playlist not found", { status: 404 });
+        
+        const channelData: ChannelData[] = playlistData.map((e) => ({ ...e.data.channel }));
+        const uniqueChannels = channelData.filter((element, index) => {
+          return channelData.findIndex((el) => el.name === element.name) === index;
+        });
+        
+        const output = `
+// Define the ChannelData interface if you haven't already
+interface ChannelData {
+  name: string;
+  url: string;
+  subCount: string;
+  id: string;
+  pfp: string;
+}
+
+// Channel data
+const ${name}: ChannelData[] = ${JSON.stringify(uniqueChannels, null, 2)};
+`;
+
         return new Response(
-          `<html>
-          <style>
-            .container {
-              display: flex;
-              justify-items: center;
-              align-items: center;
-              flex-direction: column;
-              width: 100%;
-              gap: 2rem;
-            }
-          </style>
+          `<!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Channel Data: ${id}</title>
+            <style>${commonResultPageStyle}</style>
+          </head>
           <body>
+            <nav class="navbar">
+              <div class="navbar-left">
+                <a href="/" class="navbar-brand">YouTube Data Fetcher</a>
+                <div class="navbar-title">Channel Data</div>
+              </div>
+              <div class="navbar-right">
+                <a href="/" class="home-btn">Home</a>
+                <form class="navbar-form" action="/c" method="get">
+                  <input type="text" class="navbar-input" name="id" placeholder="Enter channel ID" value="${id}" required>
+                  <input type="hidden" name="name" value="${name}">
+                  <button type="submit" class="navbar-button">Fetch</button>
+                </form>
+                <button onclick="copyToClipboard()" class="copy-btn">Copy Code</button>
+              </div>
+            </nav>
+            
             <div class="container">
-              <button style="width: fit-content" onclick="main()">Copy</button>
-              <span>${msg}</span>
+              <pre id="codeOutput">${output}</pre>
             </div>
-            <script >
-              function main() {
-                navigator.clipboard.writeText(${JSON.stringify(msg)});
+            
+            <script>
+              function copyToClipboard() {
+                const code = document.getElementById('codeOutput').textContent;
+                navigator.clipboard.writeText(code)
+                  .then(() => {
+                    const btn = document.querySelector('.copy-btn');
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => {
+                      btn.textContent = originalText;
+                    }, 2000);
+                  })
+                  .catch(err => {
+                    console.error('Failed to copy: ', err);
+                  });
               }
             </script>
           </body>
-        </html>
-        `,
+          </html>`,
           {
             headers: {
               "Content-Type": "text/html",
@@ -270,6 +813,8 @@ const server = Bun.serve({
         );
       }
     }
+    
+    // Batch route - multiple playlists
     if (serverURL.pathname === "/b" && request.method === "GET") {
       const id1 = serverURL.searchParams.get("id1");
       const id2 = serverURL.searchParams.get("id2");
@@ -293,72 +838,123 @@ const server = Bun.serve({
 
         // Create the output string with proper formatting
         const output = `
-    // Define the VideoData interface if you haven't already
-    interface VideoData {
-      data: {
-        video: {
-          title: string;
-          url: string;
-          id: string;
-          viewCount: number;
-          likeCount: number;
-          thumbnail: string;
-          date: string;
-        };
-        channel: {
-          name: string;
-          url: string;
-          subCount: string;
-          id: string;
-          pfp: string;
-        };
-      };
-    }
-    
-    // Video data arrays
-    const c1Data: VideoData[] = ${JSON.stringify(c1Data, null, 2)};
-    
-    const c2Data: VideoData[] = ${JSON.stringify(c2Data, null, 2)};
-    
-    const c3Data: VideoData[] = ${JSON.stringify(c3Data, null, 2)};
-    
-    const c4Data: VideoData[] = ${JSON.stringify(c4Data, null, 2)};
-    `;
+// Define the VideoData interface if you haven't already
+interface VideoData {
+  data: {
+    video: {
+      title: string;
+      url: string;
+      id: string;
+      viewCount: number;
+      likeCount: number;
+      thumbnail: string;
+      date: string;
+    };
+    channel: {
+      name: string;
+      url: string;
+      subCount: string;
+      id: string;
+      pfp: string;
+    };
+  };
+}
+
+// Video data arrays
+const c1Data: VideoData[] = ${JSON.stringify(c1Data, null, 2)};
+
+const c2Data: VideoData[] = ${JSON.stringify(c2Data, null, 2)};
+
+const c3Data: VideoData[] = ${JSON.stringify(c3Data, null, 2)};
+
+const c4Data: VideoData[] = ${JSON.stringify(c4Data, null, 2)};
+`;
 
         return new Response(
-          `<html>
+          `<!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Batch Data</title>
+            <style>${commonResultPageStyle}</style>
             <style>
-              .container {
-                display: flex;
-                justify-items: center;
+              .batch-form {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 10px;
                 align-items: center;
-                flex-direction: column;
-                width: 100%;
-                gap: 2rem;
               }
-              pre {
-                text-align: left;
-                max-width: 90%;
-                overflow: auto;
-                background: #f5f5f5;
-                padding: 15px;
-                border-radius: 5px;
+              
+              .batch-inputs {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 10px;
+              }
+              
+              @media (max-width: 768px) {
+                .batch-inputs {
+                  grid-template-columns: 1fr;
+                }
               }
             </style>
-            <body>
-              <div class="container">
-                <button style="width: fit-content" onclick="main()">Copy</button>
-                <pre>${output}</pre>
+          </head>
+          <body>
+            <nav class="navbar">
+              <div class="navbar-left">
+                <a href="/" class="navbar-brand">YouTube Data Fetcher</a>
+                <div class="navbar-title">Batch Data</div>
               </div>
-              <script>
-                function main() {
-                  navigator.clipboard.writeText(\`${output.replace(
-                    /`/g,
-                    "\\`"
-                  )}\`);
+              <div class="navbar-right">
+                <a href="/" class="home-btn">Home</a>
+                <button onclick="toggleForm()" class="navbar-button">New Batch</button>
+                <button onclick="copyToClipboard()" class="copy-btn">Copy Code</button>
+              </div>
+            </nav>
+            
+            <div class="container">
+              <div id="batchFormContainer" style="display: none; margin: 20px 0; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <form class="batch-form" action="/b" method="get">
+                  <div class="batch-inputs">
+                    <input type="text" class="navbar-input" name="id1" placeholder="Playlist ID 1" value="${id1}" required>
+                    <input type="text" class="navbar-input" name="id2" placeholder="Playlist ID 2" value="${id2}" required>
+                    <input type="text" class="navbar-input" name="id3" placeholder="Playlist ID 3" value="${id3}" required>
+                    <input type="text" class="navbar-input" name="id4" placeholder="Playlist ID 4" value="${id4}" required>
+                  </div>
+                  <button type="submit" class="navbar-button" style="height: auto;">Fetch Batch</button>
+                </form>
+              </div>
+              
+              <pre id="codeOutput">${output}</pre>
+            </div>
+            
+            <script>
+              function copyToClipboard() {
+                const code = document.getElementById('codeOutput').textContent;
+                navigator.clipboard.writeText(code)
+                  .then(() => {
+                    const btn = document.querySelector('.copy-btn');
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => {
+                      btn.textContent = originalText;
+                    }, 2000);
+                  })
+                  .catch(err => {
+                    console.error('Failed to copy: ', err);
+                  });
+              }
+              
+              function toggleForm() {
+                const form = document.getElementById('batchFormContainer');
+                if (form.style.display === 'none') {
+                  form.style.display = 'block';
+                } else {
+                  form.style.display = 'none';
                 }
-              </script>
-            </body>
+              }
+            </script>
+          </body>
           </html>`,
           {
             headers: {
@@ -369,23 +965,9 @@ const server = Bun.serve({
       }
     }
 
-    // return new Response(
-    //   "Usage: url.com/fetch?id=playlistID\n\nOptional: url.com/fetch?name=arrayName&id=playlistID"
-    // );
-    // return new Response(JSON.stringify({ hi: "test" }), {
-    //   headers: { "Content-Type": "application/json" },
-    // });
-    return Response.json({
-      Usage1: "url.com/v?id=videoID",
-      Optional1: "url.com/v?name=arrayName&id=videoID",
-      Usage2: "url.com/p?id=playlistID",
-      Optional2: "url.com/p?name=arrayName&id=playlistID",
-      Usage3: "url.com/c?id=playlistID",
-      Optional3: "url.com/c?name=arrayName&id=channelID",
-    });
+    // Default response redirects to the home page
+    return Response.redirect(`${serverURL.origin}/`, 302);
   },
 });
 
 console.log(`Listening on ${server.url}`);
-
-// getData()
