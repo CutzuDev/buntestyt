@@ -101,6 +101,26 @@ export async function getPlaylistInfo(playlistID: string) {
   }
 }
 
+// Open browser function
+function openBrowser(url: string) {
+  const platform = process.platform;
+  const command = 
+    platform === "win32" ? `start ${url}` :
+    platform === "darwin" ? `open ${url}` :
+    `xdg-open ${url}`;
+    
+  try {
+    Bun.spawn(command.split(" "), {
+      stdout: "inherit",
+      stderr: "inherit",
+      shell: true,
+    });
+    console.log(`Browser opened to ${url}`);
+  } catch (error) {
+    console.error(`Failed to open browser: ${error}`);
+  }
+}
+
 const server = Bun.serve({
   port: 6969,
   async fetch(request) {
@@ -971,3 +991,8 @@ const c4Data: VideoData[] = ${JSON.stringify(c4Data, null, 2)};
 });
 
 console.log(`Listening on ${server.url}`);
+
+// Open the browser automatically after server starts
+setTimeout(() => {
+  openBrowser(`http://localhost:${server.port}`);
+}, 500); // Small delay to ensure server is fully initialized
