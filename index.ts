@@ -30,10 +30,10 @@ export type ChannelData = {
   pfp: string;
 };
 
-const youtube = new Client({ 
-  fetchOptions: { 
-    headers: { 'Accept-Language': 'en' }
-  }
+const youtube = new Client({
+  fetchOptions: {
+    headers: { "Accept-Language": "en" },
+  },
 });
 
 export async function getVideoInfo(videoID: string) {
@@ -262,6 +262,104 @@ const server = Bun.serve({
           </body>
         </html>
         `,
+          {
+            headers: {
+              "Content-Type": "text/html",
+            },
+          }
+        );
+      }
+    }
+    if (serverURL.pathname === "/b" && request.method === "GET") {
+      const id1 = serverURL.searchParams.get("id1");
+      const id2 = serverURL.searchParams.get("id2");
+      const id3 = serverURL.searchParams.get("id3");
+      const id4 = serverURL.searchParams.get("id4");
+
+      if (id1 && id2 && id3 && id4) {
+        // Fetch the data for each playlist
+        const c1Promise = getPlaylistInfo(id1);
+        const c2Promise = getPlaylistInfo(id2);
+        const c3Promise = getPlaylistInfo(id3);
+        const c4Promise = getPlaylistInfo(id4);
+
+        // Wait for all promises to resolve
+        const [c1Data, c2Data, c3Data, c4Data] = await Promise.all([
+          c1Promise,
+          c2Promise,
+          c3Promise,
+          c4Promise,
+        ]);
+
+        // Create the output string with proper formatting
+        const output = `
+    // Define the VideoData interface if you haven't already
+    interface VideoData {
+      data: {
+        video: {
+          title: string;
+          url: string;
+          id: string;
+          viewCount: number;
+          likeCount: number;
+          thumbnail: string;
+          date: string;
+        };
+        channel: {
+          name: string;
+          url: string;
+          subCount: string;
+          id: string;
+          pfp: string;
+        };
+      };
+    }
+    
+    // Video data arrays
+    const c1Data: VideoData[] = ${JSON.stringify(c1Data, null, 2)};
+    
+    const c2Data: VideoData[] = ${JSON.stringify(c2Data, null, 2)};
+    
+    const c3Data: VideoData[] = ${JSON.stringify(c3Data, null, 2)};
+    
+    const c4Data: VideoData[] = ${JSON.stringify(c4Data, null, 2)};
+    `;
+
+        return new Response(
+          `<html>
+            <style>
+              .container {
+                display: flex;
+                justify-items: center;
+                align-items: center;
+                flex-direction: column;
+                width: 100%;
+                gap: 2rem;
+              }
+              pre {
+                text-align: left;
+                max-width: 90%;
+                overflow: auto;
+                background: #f5f5f5;
+                padding: 15px;
+                border-radius: 5px;
+              }
+            </style>
+            <body>
+              <div class="container">
+                <button style="width: fit-content" onclick="main()">Copy</button>
+                <pre>${output}</pre>
+              </div>
+              <script>
+                function main() {
+                  navigator.clipboard.writeText(\`${output.replace(
+                    /`/g,
+                    "\\`"
+                  )}\`);
+                }
+              </script>
+            </body>
+          </html>`,
           {
             headers: {
               "Content-Type": "text/html",
